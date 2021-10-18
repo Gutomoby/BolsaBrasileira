@@ -1,0 +1,30 @@
+import pandas as pd
+import requests
+import re
+import urllib.request
+import urllib.parse
+import http.cookiejar
+import pandas as pd
+from lxml.html import fragment_fromstring
+from collections import OrderedDict
+from decimal import Decimal
+import json
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+path = ("C:\chromedriver.exe")
+
+driver = webdriver.Chrome(path)
+
+driver.get("https://fiis.com.br/lupa-de-fiis/")
+
+html = driver.page_source
+
+tabela = pd.read_html(html)
+
+Lupa_FIIs = tabela[1]
