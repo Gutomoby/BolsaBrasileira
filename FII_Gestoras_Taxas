@@ -1,0 +1,94 @@
+import pandas as pd
+import requests
+import re
+import time
+import urllib.request
+import urllib.parse
+import http.cookiejar
+import pandas as pd
+from lxml.html import fragment_fromstring
+from collections import OrderedDict
+from decimal import Decimal
+import json
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+path = ("C:\chromedriver.exe")
+
+driver = webdriver.Chrome(path)
+
+driver.get("https://fiis.com.br/lupa-de-fiis/")
+html = driver.page_source
+tipos = pd.read_html(html,  decimal=',', thousands='.')
+driver.quit()
+paper = pd.DataFrame(data=tipos[1])
+
+Y = list(paper['Ticker'])
+
+TICKER = []
+GESTOR = []
+
+for Y in Y:
+    path = ("C:\chromedriver.exe")
+    driver = webdriver.Chrome(path)
+    driver.get("https://www.clubefii.com.br/fiis/{}".format(Y))
+    time.sleep(2)
+    gestor = driver.find_element(By.XPATH, "//table[@id=\'primaryTable\']/tbody/tr[4]").text
+    TICKER.append(Y)
+    GESTOR.append(gestor[6:])
+
+    driver.close()
+
+TICKER = pd.DataFrame(data=TICKER)
+GESTOR = pd.DataFrame(data=GESTOR)
+
+TICKER = TICKER.rename({0:"TICKER"},axis='columns')
+GESTOR = GESTOR.rename({0:"GESTOR"},axis='columns')
+
+GESTORES = pd.concat([TICKER,GESTOR], axis=1)
+
+TICKER = []
+ADMINISTRACAO = []
+GESTAO = []
+PERFORMANCE = []
+
+
+
+Y = list(ranking['Papel'])
+
+for Y in Y:
+    path = ("C:\chromedriver.exe")
+    driver = webdriver.Chrome(path)
+    driver.get("https://www.fundsexplorer.com.br/funds/{}".format(Y))
+    adm = driver.find_element(By.CSS_SELECTOR, ".col-md-6:nth-child(2) li:nth-child(6)").text
+    perf = driver.find_element(By.CSS_SELECTOR, ".col-md-6:nth-child(1) li:nth-child(7)").text
+    ges = driver.find_element(By.CSS_SELECTOR, ".col-md-6:nth-child(1) li:nth-child(8)").text
+    TICKER.append(Y)
+    ADMINISTRACAO.append(adm[22:])
+    GESTAO.append(ges[15:])
+    PERFORMANCE.append(perf[20:])
+    driver.close()
+
+
+TICKER = pd.DataFrame(data=TICKER)
+ADMINISTRACAO = pd.DataFrame(data=ADMINISTRACAO)
+GESTAO = pd.DataFrame(data=GESTAO)
+PERFORMANCE = pd.DataFrame(data=PERFORMANCE)
+
+TICKER = TICKER.rename({0:"TICKER"},axis='columns')
+ADMINISTRACAO = ADMINISTRACAO.rename({0:"ADMINISTRACAO"},axis='columns')
+GESTAO  = GESTAO .rename({0:"GESTAO "},axis='columns')
+PERFORMANCE = PERFORMANCE.rename({0:"PERFORMANCE"},axis='columns')
+
+TAXAS = pd.concat([TICKER,ADMINISTRACAO,GESTAO,PERFORMANCE], axis=1)
+
+def excel():
+    with pd.ExcelWriter(r'~\Taxas_Gestoras.xlsx') as writer:  
+        GESTORES.to_excel(writer, sheet_name='Gestoras(ClubeFII)')
+        TAXAS.to_excel(writer, sheet_name='Taxas(Fundsexplorer)')
+excel()
