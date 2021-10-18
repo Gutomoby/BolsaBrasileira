@@ -1,0 +1,38 @@
+import pandas as pd
+import requests
+import re
+import time
+import urllib.request
+import urllib.parse
+import http.cookiejar
+import pandas as pd
+from lxml.html import fragment_fromstring
+from collections import OrderedDict
+from decimal import Decimal
+import json
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+path = ("C:\chromedriver.exe")
+
+driver = webdriver.Chrome(path)
+
+driver.get("https://www.clubefii.com.br/imoveis-de-fundos-imobiliarios")
+element = driver.find_element(By.CSS_SELECTOR, "#bannerHTML > div")
+actions = ActionChains(driver)
+actions.move_to_element(element).perform()
+driver.find_element(By.CSS_SELECTOR, ".btn-primary:nth-child(12)").click()
+time.sleep(2)
+driver.find_element(By.CSS_SELECTOR, "nav:nth-child(12) > .btn-primary").click()
+time.sleep(2)
+driver.find_element(By.CSS_SELECTOR, "th:nth-child(2)").click()
+asd = driver.page_source
+ativos = pd.read_html(asd,  decimal=',', thousands='.')
+driver.close()
+
+ativos[0].to_excel(r'~\Imóvies.xlsx')
