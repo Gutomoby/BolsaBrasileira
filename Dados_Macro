@@ -1,0 +1,33 @@
+import pandas as pd
+import ipeadatapy as ipea
+
+INCC = ipea.timeseries("IGP12_INCCMG12", yearGreaterThan=2014, yearSmallerThan=2025)
+
+IPCA = ipea.timeseries("PRECOS12_IPCAG12", yearGreaterThan=2014, yearSmallerThan=2025)
+
+IGPM = ipea.timeseries("IGP12_IGPMG12", yearGreaterThan=2014, yearSmallerThan=2025)
+
+SELIC = ipea.timeseries("BM366_TJOVER366", yearGreaterThan=2014, yearSmallerThan=2025)
+
+taxa_credito = pd.read_csv("http://api.bcb.gov.br/dados/serie/bcdata.sgs.20774/dados?formato=csv", delimiter=";")
+
+concessoes_credito = pd.read_csv("http://api.bcb.gov.br/dados/serie/bcdata.sgs.20704/dados?formato=csv", delimiter=";")
+
+############################################################################################################################
+
+all_series = ipea.list_series()
+
+all_series[all_series['NAME'].str.contains("Selic")]
+
+###############################################################################################################################
+
+def excel():
+    with pd.ExcelWriter(r'~\Desktop\Mercado.xlsx') as writer:  
+        SELIC.to_excel(writer, sheet_name='SELIC')
+        INCC.to_excel(writer, sheet_name='INCC')
+        IPCA.to_excel(writer, sheet_name='IPCA')
+        IGPM.to_excel(writer, sheet_name='IGPM')
+        taxa_credito.to_excel(writer, sheet_name='TAXA_CREDITO')
+        concessoes_credito.to_excel(writer, sheet_name='CONCESSOES_CREDITO')
+        
+excel()
